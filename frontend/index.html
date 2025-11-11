@@ -1,0 +1,466 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Authentication App</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            padding: 20px;
+        }
+
+        .container {
+            background: white;
+            border-radius: 20px;
+            box-shadow: 0 20px 60px rgba(0, 0, 0, 0.3);
+            overflow: hidden;
+            width: 100%;
+            max-width: 400px;
+        }
+
+        .page {
+            display: none;
+            padding: 40px;
+        }
+
+        .page.active {
+            display: block;
+            animation: fadeIn 0.5s;
+        }
+
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(10px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        h2 {
+            color: #333;
+            margin-bottom: 30px;
+            text-align: center;
+            font-size: 28px;
+        }
+
+        .form-group {
+            margin-bottom: 20px;
+        }
+
+        label {
+            display: block;
+            color: #555;
+            margin-bottom: 8px;
+            font-weight: 500;
+            font-size: 14px;
+        }
+
+        input {
+            width: 100%;
+            padding: 12px 15px;
+            border: 2px solid #e0e0e0;
+            border-radius: 8px;
+            font-size: 14px;
+            transition: all 0.3s;
+            outline: none;
+        }
+
+        input:focus {
+            border-color: #667eea;
+            box-shadow: 0 0 0 3px rgba(102, 126, 234, 0.1);
+        }
+
+        .btn {
+            width: 100%;
+            padding: 14px;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            border: none;
+            border-radius: 8px;
+            font-size: 16px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: transform 0.2s, box-shadow 0.2s;
+            margin-top: 10px;
+        }
+
+        .btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 10px 20px rgba(102, 126, 234, 0.3);
+        }
+
+        .btn:active {
+            transform: translateY(0);
+        }
+
+        .switch-text {
+            text-align: center;
+            margin-top: 20px;
+            color: #666;
+            font-size: 14px;
+        }
+
+        .switch-link {
+            color: #667eea;
+            text-decoration: none;
+            font-weight: 600;
+            cursor: pointer;
+        }
+
+        .switch-link:hover {
+            text-decoration: underline;
+        }
+
+        .error {
+            color: #e74c3c;
+            font-size: 13px;
+            margin-top: 5px;
+            display: none;
+        }
+
+        .error.show {
+            display: block;
+        }
+
+        .success {
+            background: #d4edda;
+            color: #155724;
+            padding: 12px;
+            border-radius: 8px;
+            margin-bottom: 20px;
+            text-align: center;
+            display: none;
+        }
+
+        .success.show {
+            display: block;
+        }
+
+        .home-page {
+            text-align: center;
+        }
+
+        .welcome-text {
+            font-size: 24px;
+            color: #333;
+            margin-bottom: 20px;
+        }
+
+        .username-display {
+            font-size: 32px;
+            font-weight: bold;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+            margin-bottom: 30px;
+        }
+
+        .logout-btn {
+            background: #e74c3c;
+            margin-top: 20px;
+        }
+
+        .logout-btn:hover {
+            box-shadow: 0 10px 20px rgba(231, 76, 60, 0.3);
+        }
+
+        .loading {
+            display: none;
+            text-align: center;
+            color: #667eea;
+            margin-top: 10px;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <!-- Login Page -->
+        <div id="loginPage" class="page active">
+            <h2>Welcome Back!</h2>
+            <div id="loginSuccess" class="success"></div>
+            <div class="form-group">
+                <label for="loginUsername">Username</label>
+                <input type="text" id="loginUsername" placeholder="Enter your username">
+                <div id="loginUsernameError" class="error"></div>
+            </div>
+            <div class="form-group">
+                <label for="loginPassword">Password</label>
+                <input type="password" id="loginPassword" placeholder="Enter your password">
+                <div id="loginPasswordError" class="error"></div>
+            </div>
+            <button class="btn" onclick="handleLogin()">Log In</button>
+            <div class="loading" id="loginLoading">Logging in...</div>
+            <div class="switch-text">
+                Don't have an account? <span class="switch-link" onclick="showPage('signup')">Sign Up</span>
+            </div>
+        </div>
+
+        <!-- Signup Page -->
+        <div id="signupPage" class="page">
+            <h2>Create Account</h2>
+            <div class="form-group">
+                <label for="signupName">Full Name</label>
+                <input type="text" id="signupName" placeholder="Enter your full name">
+                <div id="signupNameError" class="error"></div>
+            </div>
+            <div class="form-group">
+                <label for="signupUsername">Username</label>
+                <input type="text" id="signupUsername" placeholder="Choose a username">
+                <div id="signupUsernameError" class="error"></div>
+            </div>
+            <div class="form-group">
+                <label for="signupEmail">Email</label>
+                <input type="email" id="signupEmail" placeholder="Enter your email">
+                <div id="signupEmailError" class="error"></div>
+            </div>
+            <div class="form-group">
+                <label for="signupPassword">Password</label>
+                <input type="password" id="signupPassword" placeholder="Create a password">
+                <div id="signupPasswordError" class="error"></div>
+            </div>
+            <div class="form-group">
+                <label for="signupPasswordConfirm">Confirm Password</label>
+                <input type="password" id="signupPasswordConfirm" placeholder="Confirm your password">
+                <div id="signupPasswordConfirmError" class="error"></div>
+            </div>
+            <button class="btn" onclick="handleSignup()">Sign Up</button>
+            <div class="loading" id="signupLoading">Creating account...</div>
+            <div class="switch-text">
+                Already have an account? <span class="switch-link" onclick="showPage('login')">Log In</span>
+            </div>
+        </div>
+
+        <!-- Home Page -->
+        <div id="homePage" class="page">
+            <div class="home-page">
+                <div class="welcome-text">Welcome,</div>
+                <div class="username-display" id="homeUsername"></div>
+                <p style="color: #666; margin-bottom: 20px;">You have successfully logged in!</p>
+                <button class="btn logout-btn" onclick="handleLogout()">Log Out</button>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        const API_URL = 'http://localhost:8080';
+
+        // Page navigation
+        function showPage(pageName) {
+            document.querySelectorAll('.page').forEach(page => {
+                page.classList.remove('active');
+            });
+            document.getElementById(pageName + 'Page').classList.add('active');
+            clearErrors();
+        }
+
+        // Clear all error messages
+        function clearErrors() {
+            document.querySelectorAll('.error').forEach(error => {
+                error.classList.remove('show');
+                error.textContent = '';
+            });
+            document.querySelectorAll('.success').forEach(success => {
+                success.classList.remove('show');
+                success.textContent = '';
+            });
+        }
+
+        // Show error message
+        function showError(elementId, message) {
+            const errorElement = document.getElementById(elementId);
+            errorElement.textContent = message;
+            errorElement.classList.add('show');
+        }
+
+        // Validate email format
+        function isValidEmail(email) {
+            return /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email);
+        }
+
+        // Handle Login
+        async function handleLogin() {
+            clearErrors();
+            
+            const username = document.getElementById('loginUsername').value.trim();
+            const password = document.getElementById('loginPassword').value;
+
+            // Client-side validation
+            let hasError = false;
+
+            if (!username) {
+                showError('loginUsernameError', 'Username is required');
+                hasError = true;
+            }
+
+            if (!password) {
+                showError('loginPasswordError', 'Password is required');
+                hasError = true;
+            }
+
+            if (hasError) return;
+
+            // Show loading
+            document.getElementById('loginLoading').style.display = 'block';
+
+            try {
+                const response = await fetch(`${API_URL}/api/auth/login`, {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                    },
+                    body: JSON.stringify({
+                        username: username,
+                        password: password
+                    })
+                });
+
+                const data = await response.json();
+
+                if (response.ok) {
+                    // Store username for home page
+                    sessionStorage.setItem('username', data.username || username);
+                    
+                    // Navigate to home page
+                    document.getElementById('homeUsername').textContent = data.username || username;
+                    showPage('home');
+                } else {
+                    showError('loginPasswordError', data.message || 'Invalid credentials');
+                }
+            } catch (error) {
+                showError('loginPasswordError', 'Connection error. Make sure the backend server is running on localhost:8080');
+                console.error('Login error:', error);
+            } finally {
+                document.getElementById('loginLoading').style.display = 'none';
+            }
+        }
+
+        // Handle Signup
+        async function handleSignup() {
+            clearErrors();
+
+            const name = document.getElementById('signupName').value.trim();
+            const username = document.getElementById('signupUsername').value.trim();
+            const email = document.getElementById('signupEmail').value.trim();
+            const password = document.getElementById('signupPassword').value;
+            const passwordConfirm = document.getElementById('signupPasswordConfirm').value;
+
+            // Client-side validation
+            let hasError = false;
+
+            if (!name) {
+                showError('signupNameError', 'Full name is required');
+                hasError = true;
+            }
+
+            if (!username) {
+                showError('signupUsernameError', 'Username is required');
+                hasError = true;
+            } else if (username.length < 3) {
+                showError('signupUsernameError', 'Username must be at least 3 characters');
+                hasError = true;
+            }
+
+            if (!email) {
+                showError('signupEmailError', 'Email is required');
+                hasError = true;
+            } else if (!isValidEmail(email)) {
+                showError('signupEmailError', 'Please enter a valid email');
+                hasError = true;
+            }
+
+            if (!password) {
+                showError('signupPasswordError', 'Password is required');
+                hasError = true;
+            } else if (password.length < 6) {
+                showError('signupPasswordError', 'Password must be at least 6 characters');
+                hasError = true;
+            }
+
+            if (!passwordConfirm) {
+                showError('signupPasswordConfirmError', 'Please confirm your password');
+                hasError = true;
+            } else if (password !== passwordConfirm) {
+                showError('signupPasswordConfirmError', 'Passwords do not match');
+                hasError = true;
+            }
+
+            if (hasError) return;
+
+            // Show loading
+            document.getElementById('signupLoading').style.display = 'block';
+
+            try {
+                const response = await fetch(`${API_URL}/api/auth/signup`, {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                    },
+                    body: JSON.stringify({
+                        name: name,
+                        username: username,
+                        email: email,
+                        password: password
+                    })
+                });
+
+                const data = await response.json();
+
+                if (response.ok) {
+                    // Show success message and navigate to login
+                    const successMsg = document.getElementById('loginSuccess');
+                    successMsg.textContent = 'Account created successfully! Please log in.';
+                    successMsg.classList.add('show');
+                    
+                    showPage('login');
+                    
+                    // Clear the form
+                    document.getElementById('signupName').value = '';
+                    document.getElementById('signupUsername').value = '';
+                    document.getElementById('signupEmail').value = '';
+                    document.getElementById('signupPassword').value = '';
+                    document.getElementById('signupPasswordConfirm').value = '';
+                } else {
+                    // Show specific error based on response
+                    if (data.field) {
+                        showError(`signup${data.field.charAt(0).toUpperCase() + data.field.slice(1)}Error`, data.message);
+                    } else {
+                        showError('signupNameError', data.message || 'Signup failed');
+                    }
+                }
+            } catch (error) {
+                showError('signupNameError', 'Connection error. Make sure the backend server is running on localhost:8080');
+                console.error('Signup error:', error);
+            } finally {
+                document.getElementById('signupLoading').style.display = 'none';
+            }
+        }
+
+        // Handle Logout
+        function handleLogout() {
+            sessionStorage.removeItem('username');
+            showPage('login');
+        }
+
+        // Add Enter key support
+        document.addEventListener('DOMContentLoaded', function() {
+            document.getElementById('loginPassword').addEventListener('keypress', function(e) {
+                if (e.key === 'Enter') handleLogin();
+            });
+
+            document.getElementById('signupPasswordConfirm').addEventListener('keypress', function(e) {
+                if (e.key === 'Enter') handleSignup();
+            });
+        });
+    </script>
+</body>
+</html>
