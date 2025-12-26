@@ -1,0 +1,7 @@
+D:\projects back\mentoring\websitePro1\websitePro1\bin\Debug\websitePro1.exe.config
+D:\projects back\mentoring\websitePro1\websitePro1\bin\Debug\websitePro1.exe
+D:\projects back\mentoring\websitePro1\websitePro1\bin\Debug\websitePro1.pdb
+D:\projects back\mentoring\websitePro1\websitePro1\obj\Debug\websitePro1.csproj.AssemblyReference.cache
+D:\projects back\mentoring\websitePro1\websitePro1\obj\Debug\websitePro1.csproj.CoreCompileInputs.cache
+D:\projects back\mentoring\websitePro1\websitePro1\obj\Debug\websitePro1.exe
+D:\projects back\mentoring\websitePro1\websitePro1\obj\Debug\websitePro1.pdb
